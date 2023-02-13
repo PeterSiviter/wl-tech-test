@@ -6,18 +6,15 @@ namespace App\Command;
 
 use App\Factory\WebScraperFactory;
 use App\Factory\WebScraperFactoryInterface;
-use App\Scraper\WebScraper;
 use Exception;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request as AsyncRequest;
 use Teapot\HttpException;
 use Teapot\StatusCode;
 
@@ -53,18 +50,24 @@ final class WlTestCommand extends Command implements StatusCode
         if ($webPage) {
             $io->note(sprintf('Attempting to scrape: %s...', $webPage));
 
-            /** @var WebScraper $scraper */
-            $scraper = $this->scraperFactory->create();
             try {
+                // Create our scraper
+                $scraper = $this->scraperFactory->create();
+
+                // Create new web client to provide to the scraper
                 $client = new Client();
-                $items = $scraper->scrape($webPage, $client, $io);
+
+                // Scrape to get an array of elements, any exceptions thrown will be caught below
+                $items = $scraper->scrape($webPage, $client);
             } catch (HttpException $e) {
+                // Logging the exception type helps identify what went wrong, hence different exception handlers here
                 $io->writeln('HttpException: ' . $e->getMessage() . " " . $e->getCode());
                 return Command::FAILURE;
             } catch (GuzzleException $e) {
                 $io->writeln('GuzzleException: ' . $e->getMessage() . " " . $e->getCode());
                 return Command::FAILURE;
             } catch (Exception $e) {
+                // Catch the rest
                 $io->writeln('Exception: ' . $e->getMessage() . " " . $e->getCode());
                 return Command::FAILURE;
             }

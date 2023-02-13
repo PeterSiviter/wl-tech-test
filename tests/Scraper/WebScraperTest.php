@@ -1,17 +1,13 @@
 <?php
 
 namespace App\Tests\Scraper;
+
 use App\Factory\WebScraperFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Exception\RequestException;
-
-use App\Scraper\WebScraper;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Teapot\HttpException;
 
 /**
@@ -41,6 +37,11 @@ class WebScraperTest extends TestCase
         $this->assertSame(6, count($items));
     }
 
+    private function getResponseText(): string
+    {
+        return file_get_contents(__DIR__ . '../../fixtures/response.html');
+    }
+
     public function testWebScraperThrowsExceptionWithInvalidUrl(): void
     {
         // Create a mock http handler and queue any old response (not used for this test)
@@ -60,11 +61,6 @@ class WebScraperTest extends TestCase
         $this->expectExceptionMessage(sprintf('Web Scraping Exception: %s is not a valid URL', $webPage));
 
         $scraper->scrape($webPage, $client);
-    }
-
-    private function getResponseText(): string
-    {
-        return file_get_contents(__DIR__ . '../../fixtures/response.html');
     }
 
 }

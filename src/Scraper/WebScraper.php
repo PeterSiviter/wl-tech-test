@@ -6,10 +6,8 @@ namespace App\Scraper;
 
 use DOMDocument;
 use DOMXPath;
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Teapot\HttpException;
 use Teapot\StatusCode;
@@ -43,7 +41,7 @@ final class WebScraper implements ScraperInterface
             );
         }
 
-        return $this->parseBody((string) $result->getBody());
+        return $this->parseBody((string)$result->getBody());
     }
 
     /**
@@ -60,7 +58,8 @@ final class WebScraper implements ScraperInterface
 
         $results = [];
 
-        // Extract each element in turn
+        // Extract each of the elements in turn using XPath and merge into the output array with the array element
+        // defined here.
         $expression = '//div[starts-with(@class, "package ")]//h3';
         $this->extract($expression, 'option-title', $xPath, $results);
 
@@ -73,11 +72,16 @@ final class WebScraper implements ScraperInterface
         $expression = '//div[starts-with(@class, "package-data")]';
         $this->extract($expression, 'package-data', $xPath, $results);
 
+        // Post process the results array to calc the annual cost where not provided and rename package-price as price
+        // and sort the array.
         $this->postProcess($results);
 
         return $results;
     }
 
+    /**
+     * Query the DOM using the XPath provided and merge the output into the results array
+     */
     private function extract(string $expression, string $element, DOMXPath $xPath, array &$results): void
     {
         $optionTitles = $xPath->query($expression);
@@ -95,7 +99,7 @@ final class WebScraper implements ScraperInterface
         foreach ($results as &$result) {
             $result['discount'] = 0;
             $parts = explode('Save', $result['package-price']);
-            if(count($parts) > 1) {
+            if (count($parts) > 1) {
                 $result['discount'] = preg_replace('/[^0-9,.]+/', '', $parts[1]);
                 $result['package-price'] = $parts[0];
             }
@@ -103,14 +107,14 @@ final class WebScraper implements ScraperInterface
             $result['price'] = $result['package-price'] =
                 trim(preg_replace('/[^0-9,.]+/', '', $result['package-price']), '.');
             $result['annual-price'] = strtok($result['package-data'], ' ') == '12' ?
-                (float)(12 * trim($result['package-price'], '.')):
+                (float)(12 * trim($result['package-price'], '.')) :
                 (float)trim($result['package-price'], '.');
             unset($result['package-data']);
             unset($result['package-price']);
         }
 
         // Sort by annual price descending
-        usort($results, function($a, $b) {
+        usort($results, function ($a, $b) {
             return $b['annual-price'] > $a['annual-price'] ? 1 : -1;
         });
     }
