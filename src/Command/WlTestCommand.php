@@ -26,8 +26,7 @@ final class WlTestCommand extends Command implements StatusCode
 {
     private const DEFAULT_WEB_PAGE = 'https://wltest.dns-systems.net';
 
-    private readonly WebScraperFactoryInterface $scraperFactory;
-
+    private WebScraperFactoryInterface $scraperFactory;
 
     protected function configure(): void
     {
