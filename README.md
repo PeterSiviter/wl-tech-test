@@ -1,7 +1,7 @@
 # Wireless Logic Tech Test by Pete Siviter, 11 February 2023
 
 This is the Wireless Logic technical test.  It is implemented as a Symfony 6 Cli command which 
-can either be run inside the a docker container or stand alone from a bash prompt with the 
+can either be run inside a docker container or stand alone from a bash prompt with the 
 correct components already installed.  There is also a docker-compose file that can bring up an environment 
 in docker suitable to run this project if needed.
 
