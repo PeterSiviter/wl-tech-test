@@ -5,6 +5,25 @@ can either be run inside a docker container or stand alone from a bash prompt wi
 correct components already installed.  There is also a docker-compose file that can bring up an environment 
 in docker suitable to run this project if needed.
 
+# TL;DR
+
+Ensure `php` (8.2.1 in my case), `composer` and `git` are available from the command line, create and cd to an empty directory. 
+Optionally, `docker-compose` should also be available at the cli.
+
+-----
+```bash
+git clone https://github.com/PeterSiviter/wl-tech-test.git
+cd wl-tech-test
+composer install
+
+bin/phpunit
+# Tests should pass
+
+bin/console wl:test
+# Should output json array 
+```
+-----
+
 ## Running from a bash prompt
 
 cd into the project root and run composer install.
@@ -33,9 +52,16 @@ There are unit tests available which can be run using `bin/phpunit` from the pro
 bin/phpunit
 ```
 
-Output should look like
+Output should look similar to
 ```bash
-bin/phpunit
+PHPUnit 9.6.3 by Sebastian Bergmann and contributors.
+
+Testing
+..                                                                  2 / 2 (100%)
+
+Time: 00:00.034, Memory: 10.00 MB
+
+OK (2 tests, 3 assertions)
 ```
 
 ## Installation in docker-compose
@@ -50,25 +76,25 @@ bash prompt inside the container.
 
 ## Files
 
-Classes
+_Classes_
 
 `src/Scraper/WebScraper.php` The scraper itself.
 
 `src/Scraper/ScraperInterface.php` Interface for the above, used to provide ability to substitute a mock in tests.
 
-`src/Factory/WebScraperFactory.php` Simple factory class to generate scrapers.
+`src/Factory/WebScraperFactory.php` Factory class to generate scraper.
 
-`src/Factory/WebScraperFactoryInterface.php` interface for the above.
+`src/Factory/WebScraperFactoryInterface.php` Interface for the above.
 
 `src/Command/WlTestCommand.php` Symfony Command class that is invoked by the command line above.
 
-Tests
+_Tests_
 
 `tests/Scraper/WebScraperTest.php` Unit test of the `WebScraper` class.  Unit test, responses from the http client 
 are mocked.
 
-Fixtures
+_Fixtures_
 
-`tests/fixtures/response.html` sample response used in mock http client.
+`tests/fixtures/response.html` Sample response used in mock http client.
 
 
