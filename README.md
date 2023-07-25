@@ -1,4 +1,4 @@
-# Wireless Logic Tech Test by Pete Siviter, 11 February 2023
+# Wireless Logic Tech Test by Pete Siviter
 
 This is the Wireless Logic technical test.  It is implemented as a Symfony 6 Cli command which 
 can either be run inside a docker container or stand alone from a bash prompt with the 
